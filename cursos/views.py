@@ -1,11 +1,14 @@
-from gc import get_objects
-from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
+
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import Course, Avaliation
 from .serializers import AvaliationSerializer, CourseSerializer
 
+# API V1
 
 class CoursesAPIView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
@@ -38,3 +41,21 @@ class AvaliationAPIView(generics.RetrieveUpdateDestroyAPIView):
                                     course_id=course_pk,
                                     pk=avaliation_pk)
         return get_object_or_404(self.get_queryset(), pk=avaliation_pk)
+
+
+# API V2
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
+    @action(detail=True, methods=['get'])
+    def avaliations(self, request, pk=None):
+        course = self.get_object()
+        serailizer = AvaliationSerializer(course.avaliations.all(), many=True)
+        return Response(serailizer.data)
+
+
+class AvaliationViewSet(viewsets.ModelViewSet):
+    queryset = Avaliation.objects.all()
+    serializer_class = AvaliationSerializer
