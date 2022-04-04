@@ -7,11 +7,11 @@ class AvaliationSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'email': {'write_only': True}
         }
+        optional_fields = ['comment',]
         fields = (
             'id',
             'name',
             'email',
-            'comment',
             'rate',
             'course',
             'active',
